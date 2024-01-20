@@ -1,0 +1,129 @@
+CREATE DATABASE AcDatabase;
+
+USE AcDatabase;
+
+CREATE TABLE Authorizations (
+    authorization_id INT AUTO_INCREMENT PRIMARY KEY,
+    authorization_name VARCHAR(10)
+);
+
+CREATE TABLE Users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_nickname VARCHAR(50) NOT NULL,
+    user_email VARCHAR(256) NOT NULL,
+    user_password VARCHAR(256) NOT NULL,
+    registration_date DATETIME NOT NULL,
+    user_contract TINYINT,
+    forgot  TEXT ,
+    authorization_id INT NOT NULL,
+    FOREIGN KEY (authorization_id) REFERENCES Authorizations(authorization_id)
+);
+
+CREATE TABLE User_details (
+    user_id INT NOT NULL,
+    display_name VARCHAR(50) NOT NULL,
+    user_image VARCHAR(255),
+    user_about MEDIUMTEXT,
+    number_of_questions INT DEFAULT 0,
+    number_of_answers INT DEFAULT 0,
+    country VARCHAR(50),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE Company_information (
+    authorization_id INT NOT NULL,
+    company_about MEDIUMTEXT,
+    company_phonenumber VARCHAR(25) NOT NULL,
+    company_email VARCHAR(255) NOT NULL,
+    company_address VARCHAR(255) NOT NULL,
+    privacy_policy MEDIUMTEXT NOT NULL,
+    Linkedin VARCHAR(255),
+    FOREIGN KEY (authorization_id) REFERENCES Authorizations(authorization_id)
+);
+
+CREATE TABLE Category (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    category_type VARCHAR(50)
+);
+
+CREATE TABLE Questions (
+    questions_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    category_id INT NOT NULL,
+    question_title MEDIUMTEXT NOT NULL,
+    questions MEDIUMTEXT NOT NULL,
+    question_date DATETIME NOT NULL,
+    question_like INT DEFAULT 0,
+    question_dislike INT DEFAULT 0, 
+    number_of_views INT DEFAULT 0,
+    total_responses_received INT DEFAULT 0,
+
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (category_id) REFERENCES Category(category_id)
+);
+
+CREATE TABLE Answers (
+    answer_id INT AUTO_INCREMENT PRIMARY KEY,
+    questions_id INT NOT NULL,
+    user_id INT NOT NULL,
+    answer MEDIUMTEXT NOT NULL,
+    answer_like INT DEFAULT 0,
+    answer_dislike INT DEFAULT 0, 
+    answer_date DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (questions_id) REFERENCES Questions(questions_id)
+);
+
+CREATE TABLE Reaction_Log (
+    user_id INT NOT NULL,
+    questions_id INT NOT NULL,
+    reaction_type ENUM('like', 'dislike') NOT NULL,
+    PRIMARY KEY (questions_id ,user_id ),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (questions_id) REFERENCES Questions(questions_id)
+); 
+
+CREATE TABLE Answer_Reaction_Log (
+    user_id INT NOT NULL,
+    answer_id INT NOT NULL,
+    reaction_type ENUM('like', 'dislike') NOT NULL,
+    PRIMARY KEY (answer_id ,user_id ),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (answer_id) REFERENCES Answers(answer_id)
+);
+
+CREATE TABLE View_Log (
+    view_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    questions_id INT NOT NULL,
+    UNIQUE KEY unique_view (user_id, questions_id),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (questions_id) REFERENCES Questions(questions_id)
+);
+
+CREATE TABLE Contact(
+contact_id  INT AUTO_INCREMENT PRIMARY KEY,
+contact_nick VARCHAR(50) NOT NULL,
+contact_email VARCHAR(256) NOT NULL,
+contact_title  MEDIUMTEXT NOT NULL,
+contact_message MEDIUMTEXT NOT NULL,
+contact_date DATETIME NOT NULL
+);
+
+INSERT INTO Authorizations (authorization_name) 
+VALUES 
+('admin'),
+('moderatör'),
+('kullanıcı');
+
+INSERT INTO Users (user_nickname,user_email,user_password,registration_date,user_contract,authorization_id) 
+VALUES ('ada','ada@gmail.com','ada123','2023-12-17',1,1);
+
+INSERT INTO Category (category_type) 
+VALUES
+('Diğer'),
+('Teknoloji'),
+('Sanat'),
+('Kitap'),
+('Film'),
+('Spor');
